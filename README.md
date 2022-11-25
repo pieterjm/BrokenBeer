@@ -12,6 +12,8 @@ VulnerableBeer requires internet access. When VulnerableBeer is started for the 
 
 Once connected to the internet, a WebSocket connection will be opened to 'legend.lnbits.com'. This is an open 'test' server for LNbits (https://lnbits.com), a wallet system (based on Bitcoin Lightning) that enables various features such as connected a payment to an interaction with a device (the beer tap). A wallet in LNbits is configured to send a message via the WebSocket, when someone has payed for a beer. The payment URL is available in the QR code. This can be scanned with any modern Bitcoin wallet (Bluewallet, Wallet of Satoshi, ...).
 
+![](lnurlpaymentvulnerablebeer.png)
+
 After a succesfull payment, a message is sent over the WebSocket connection, the valve is opened, a beer is poured, and the valve is closed. 
 
 ### Serial interface
