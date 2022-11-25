@@ -32,8 +32,8 @@ int config_servo_valve_open = 0;  // angle for servo in open position
 int config_servo_valve_close = 90; // angle for servo in closed position
 
 String device_id = "ZTSPSCkG";
-bool bAdminMode = true; // admin mode enabled or not
-bool bDebugMode = true; // verbose debug mode
+bool bAdminMode = false; // admin mode enabled or not
+bool bDebugMode = false; // verbose debug mode
 
 #define BEER_STATE_UNAVAILEBLE 0    // Beer tap not ready
 #define BEER_STATE_AVAILABLE   1    // Beer tap ready to pour a beer
