@@ -408,6 +408,7 @@ void errorCallback(cmd_error *errorPtr)
 String getContentType(String filename) {
   if (filename.endsWith(".html")) return "text/html";
   else if (filename.endsWith(".css")) return "text/css";
+  else if (filename.endsWith(".gif")) return "image/gif";
   else if (filename.endsWith(".png")) return "image/png";
   else if (filename.endsWith(".js")) return "application/javascript";
   else if (filename.endsWith(".ico")) return "image/x-icon";
@@ -480,10 +481,7 @@ void setup()
   webSocket.setReconnectInterval(5000);
 
   // web server config
-  server.on("/index.html", HTTP_GET, []() {handleFileRequest("/index.html");});
-  server.on("/styles.css", HTTP_GET, []() {handleFileRequest("/styles.css");});
-  server.on("/", HTTP_GET, []() {handleFileRequest("/index.html");});
-  server.on("/lnurlpaymentvulnerablebeer.png", HTTP_GET, []() {handleFileRequest("/lnurlpaymentvulnerablebeer.png");});
+  server.serveStatic("/",LittleFS,"/");
   server.begin();
 
   delay(1000);

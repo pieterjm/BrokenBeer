@@ -26,7 +26,7 @@ As a normal user, three commands are available: 'help', 'reboot' and 'admin'. To
 In admin mode, more commands are available. Type 'help' to see them. In this mode, a beer can be entered. 
 
 ### Web interface
-The beer tap also operates a web interface. Initially only for configuring the Wi-Fi, but later on also as a welcome message with instructions. The web pages are stored in the 'data' directory of the project and stored in flash on the microcontroller. 
+The beer tap also operates a web interface. Initially only for configuring the Wi-Fi, but later on also as a welcome message with instructions. The web pages are stored in the 'data' directory of the project and stored in flash on the microcontroller.
 
 ## Compiling and flashing the firmware
 
