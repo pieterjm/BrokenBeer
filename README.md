@@ -8,9 +8,11 @@ VulnerableBeer is a Vulnerable-by-Design IoT beer tender application. This versi
 VulnerableBeer is an old beertender that is modified to accomodate a 'tapvat' (https://www.beerwulf.com/nl/p/bier/heineken-5l-tapvat). The lever of the 'tapvat' is operated by a servo (https://www.tinytronics.nl/shop/nl/mechanica-en-actuatoren/motoren/servomotoren/td-8130mg-waterproof-digitale-servo-30kg), which is controlled by a D1 mini pro (ESP8266) microcontroller (https://www.benselectronics.nl/wemos-d1-mini-pro.html). 
 
 ### Happy flow, ordering a beer
+The happy flow of vulnerable beer is to order a beer after making a payment with Bitcoin over the lightning network. For this purpose, LNbits (https://lnbits.com) is used. LNbits is an open-source wallet system with various features to connect lightning wallets to devices.  
+
 VulnerableBeer requires internet access. When VulnerableBeer is started for the first time, an open accesspoint is started (VulnerableBeer). When connected to this network, a web page should be opened with a menu to configure internet access. These settings are stored in the D1 mini so that when starting the next time, the network connection is automatically started. If the configured Wi-Fi network is not detected, the open accesspoint will be provided to reconfigure the wireless network.
 
-Once connected to the internet, a WebSocket connection will be opened to 'legend.lnbits.com'. This is an open 'test' server for LNbits (https://lnbits.com), a wallet system (based on Bitcoin Lightning) that enables various features such as connected a payment to an interaction with a device (the beer tap). A wallet in LNbits is configured to send a message via the WebSocket, when someone has payed for a beer. The payment URL is available in the QR code. This can be scanned with any modern Bitcoin wallet (Bluewallet, Wallet of Satoshi, ...).
+Once connected to the internet, a WebSocket connection will be opened to 'legend.lnbits.com'. This is an open 'test' server of LNbits. A wallet in LNbits is configured to send a message via the WebSocket, when someone has payed for a beer. The payment URL is available in the QR code. This can be scanned with any modern Bitcoin wallet (Bluewallet, Wallet of Satoshi, ...).
 
 ![](lnurlpaymentvulnerablebeer.png)
 
