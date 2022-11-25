@@ -404,6 +404,35 @@ void errorCallback(cmd_error *errorPtr)
   Serial.println("ERROR: " + e.toString());
 }
 
+// get content type based on extension
+String getContentType(String filename) {
+  if (filename.endsWith(".html")) return "text/html";
+  else if (filename.endsWith(".css")) return "text/css";
+  else if (filename.endsWith(".png")) return "image/png";
+  else if (filename.endsWith(".js")) return "application/javascript";
+  else if (filename.endsWith(".ico")) return "image/x-icon";
+  else if (filename.endsWith(".gz")) return "application/x-gzip";
+  else if (filename.endsWith(".txt")) return "text/plain";
+  return "text/plain";
+}
+
+// utility function for the webserver, provides files from the data directory
+void handleFileRequest(String path) {
+  if ( bDebugMode ) {
+    Serial.println("Request for resource: " + path);
+  }
+
+  String contentType = getContentType(path);
+  File file = LittleFS.open(path,"r");
+  if ( file ) {
+    server.streamFile(file, contentType);                 //Send it to the client
+    file.close();                                                  //Close the file again
+  } else {
+    Serial.println("File does not exist");
+    server.send(404, "text/plain", "404: Not Found");  
+  }
+}
+
 void setup()
 {
   // Initialise serial port and print welcome message
@@ -412,6 +441,13 @@ void setup()
   delay(5000);
   Serial.println("Initializing Vulnerable Beer Dispenser");
   Serial.println("");
+
+  // initialize flash storage
+  Serial.println("Initializing flash storage");
+  if ( !LittleFS.begin() ) {
+    Serial.println("Could not start Flash Filesystem");
+  }
+
 
   // attaching servo  
   Serial.println("Attaching servo");
@@ -443,6 +479,13 @@ void setup()
   webSocket.onEvent(webSocketEventHandler);
   webSocket.setReconnectInterval(5000);
 
+  // web server config
+  server.on("/index.html", HTTP_GET, []() {handleFileRequest("/index.html");});
+  server.on("/styles.css", HTTP_GET, []() {handleFileRequest("/styles.css");});
+  server.on("/", HTTP_GET, []() {handleFileRequest("/index.html");});
+  server.on("/lnurlpaymentvulnerablebeer.png", HTTP_GET, []() {handleFileRequest("/lnurlpaymentvulnerablebeer.png");});
+  server.begin();
+
   delay(1000);
   Serial.println("CLI ready");
   Serial.print(" > ");
@@ -453,6 +496,9 @@ void setup()
 
 void loop()
 {
+  // keep webserver running
+  server.handleClient();
+
   // keep websocket connection running
   webSocket.loop();
 
