@@ -25,6 +25,9 @@ As a normal user, three commands are available: 'help', 'reboot' and 'admin'. To
 
 In admin mode, more commands are available. Type 'help' to see them. In this mode, a beer can be entered. 
 
+### Web interface
+The beer tap also operates a web interface. Initially only for configuring the Wi-Fi, but later on also as a welcome message with instructions. The web pages are stored in the 'data' directory of the project and stored in flash on the microcontroller. 
+
 ## Compiling and flashing the firmware
 
  1. Install Visual Studio code
@@ -36,8 +39,12 @@ In admin mode, more commands are available. Type 'help' to see them. In this mod
  4. When prompted for the repository URL, enter the URL of this repository: git@github.com:pieterjm/VulnerableBeer.git
  5. Select a local directrory where to store the repository and open the repository.
  6. Click the checkmark icon in the blue bar at the bottom to compile the repository. This may take a while as external libraries have to be loaded.
- 7. Connect the D1 mini microcontroller to a USB port and click the Arrow button in the blue bar at the bottom to compile and flash the firmware on the D1 mini. The application should automatically run after flashing.
- 8. To open the serial monitor, and access the serial CLI of the D1 mini, enter Ctrl-Alt-S
+ 7. Connect the D1 mini microcontroller to a USB port and click the Arrow button in the blue bar at the bottom to compile and flash the firmware on the D1 mini. 
+ 8. To flash the filesystem to the microcontroller, click the PlatformIO (alien) icon on the left in Visual Studio. Expand 'd1_mini' and 'Platform' and click 'Build Filesystem Image' and 'Flash Filesystem Image'. Make sure that the serial monitor is disabled to prevent upload errors.
+
+![Uploading Filesystem](flash_filesystem.png)
+
+ 9. After flashing is complete, open the serial monitor, to access the serial CLI of the D1 mini, enter Ctrl-Alt-S
  
  
  
