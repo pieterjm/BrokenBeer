@@ -26,14 +26,14 @@ Servo beerServo;
 // config parameters
 int config_gpio_pin = 13;    // PIN number of the servo 13 == D7 on the D1 mini
 int config_initial_delay = 5000;   // delay before opening the valve
-int config_valve_open_delay = 2000;  // delay when valve remains open
+int config_valve_open_delay = 4000;  // delay when valve remains open
 int config_after_beer_delay = 2000; // delay after valve is closed
-int config_servo_valve_open = 0;  // angle for servo in open position
-int config_servo_valve_close = 90; // angle for servo in closed position
+int config_servo_valve_open = 180;  // angle for servo in open position
+int config_servo_valve_close = 0; // angle for servo in closed position
 
 String device_id = "ZTSPSCkG";
-bool bAdminMode = false; // admin mode enabled or not
-bool bDebugMode = false; // verbose debug mode
+bool bAdminMode = true; // admin mode enabled or not
+bool bDebugMode = true; // verbose debug mode
 
 #define BEER_STATE_UNAVAILEBLE 0    // Beer tap not ready
 #define BEER_STATE_AVAILABLE   1    // Beer tap ready to pour a beer
@@ -165,7 +165,9 @@ void beerCallback(cmd *cmdPtr)
   if (!bAdminMode)
   {
     Serial.println(ERROR_ACCESS_DENIED);
+    return;
   }
+
   Command cmd(cmdPtr);
   int argNum = cmd.countArgs();
 
@@ -453,6 +455,7 @@ void setup()
   // attaching servo  
   Serial.println("Attaching servo");
   pinMode(LED_BUILTIN, OUTPUT);  // Enable the LED on the D1 mini to light when a beer is poured
+  beerServo.write(config_servo_valve_close); // close servo valve
   beerServo.attach(config_gpio_pin);
   delay(1000);
   beerServo.write(config_servo_valve_close); // close servo valve
