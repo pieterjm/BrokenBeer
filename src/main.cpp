@@ -21,13 +21,13 @@ Servo beerServo;
 #define ERROR_UNKNOWN_COMMAND_ARGUMENT "Unknown command argument."
 #define ERROR_UNKNOWN_COMMAND "Unknown command."
 #define ERROR_ACCESS_DENIED "Not allowed."
-#define WSC_BEER_COMMAND "1-59"
+#define WSC_BEER_COMMAND "59-1"
 
 // config parameters
 int config_gpio_pin = 13;    // PIN number of the servo 13 == D7 on the D1 mini
 int config_initial_delay = 5000;   // delay before opening the valve
-int config_valve_open_delay = 4000;  // delay when valve remains open
-int config_after_beer_delay = 2000; // delay after valve is closed
+int config_valve_open_delay = 8000;  // delay when valve remains open
+int config_after_beer_delay = 4000; // delay after valve is closed
 int config_servo_valve_open = 180;  // angle for servo in open position
 int config_servo_valve_close = 0; // angle for servo in closed position
 
@@ -35,15 +35,18 @@ String device_id = "ZTSPSCkG";
 bool bAdminMode = true; // admin mode enabled or not
 bool bDebugMode = true; // verbose debug mode
 
-#define BEER_STATE_UNAVAILEBLE 0    // Beer tap not ready
+#define BEER_STATE_UNAVAILABLE 0    // Beer tap not ready
 #define BEER_STATE_AVAILABLE   1    // Beer tap ready to pour a beer
 #define BEER_STATE_POURING     2    // Beer tap pouring beer
-int beerState = BEER_STATE_UNAVAILEBLE;
+int beerState = BEER_STATE_UNAVAILABLE;
+
+// led blink interval when available for pouring beer
+#define LED_BLINK_INTERVAL 2000
 
 String configURL = "https://pastebin.com/raw/";
 String adminPassword = "bfd3617727eab0e800e62a776c76381defbc4145"; // SHA1 hash of correcthorsebatterystaple
 #define WEBSOCKET_HOST "legend.lnbits.com"
-#define WEBSOCKET_PATH "/lnurldevice/ws/fGXLWdJXvgyRfTZ8G2jieM" // legend.lnbits.com
+#define WEBSOCKET_PATH "/api/v1/ws/ga3evnE7HtCzvWTApcP8vG" // legend lnbits.com 
 
 const uint8_t LED_ACTIVE = LOW;
 
@@ -118,7 +121,6 @@ void helpCallback(cmd *cmdPtr)
 // this function pours some beer
 bool beer()
 {
-  // check if we're ready to poor a beer
   if ( beerState == BEER_STATE_AVAILABLE ) {
     beerState = BEER_STATE_POURING;
   } else {
@@ -128,6 +130,9 @@ bool beer()
     return false;
   }
 
+  // turn on led
+  digitalWrite(LED_BUILTIN, LOW);
+  
   if ( bDebugMode ) {
     Serial.println("Waiting initial delay");
   }
@@ -135,7 +140,6 @@ bool beer()
   if ( bDebugMode ) {
     Serial.println("Opening valve");
   }
-  digitalWrite(LED_BUILTIN, LOW);
   beerServo.write(config_servo_valve_open);
   if ( bDebugMode ) {
     Serial.println("Valve open");
@@ -145,8 +149,6 @@ bool beer()
     Serial.println("Closing valve");
   }
   beerServo.write(config_servo_valve_close);
-  digitalWrite(LED_BUILTIN, HIGH);
-  Serial.println(LED_BUILTIN);
   if ( bDebugMode ) {
     Serial.println("Waiting after a beer has been poured");
   }
@@ -155,7 +157,11 @@ bool beer()
   if ( bDebugMode ) {
     Serial.println("Returning to available beerState");
   }
+
+  // turn off led
+  digitalWrite(LED_BUILTIN, HIGH);
   beerState = BEER_STATE_AVAILABLE;
+
   return true;
 }
 
@@ -303,6 +309,10 @@ void webSocketEventHandler(WStype_t type, uint8_t *payload, size_t length)
     if ( bDebugMode ) {
       Serial.printf("[WSc] Disconnected!\n");
     }
+
+    // set beerState to available and blink led slowly
+    beerState = BEER_STATE_UNAVAILABLE;
+
     break;
   case WStype_CONNECTED:
   {
@@ -310,6 +320,10 @@ void webSocketEventHandler(WStype_t type, uint8_t *payload, size_t length)
       Serial.printf("[WSc] Connected to url: %s\n", payload);
       Serial.println("[WSc] SENT: Connected");
     }
+
+    // set beerState to available and blink led slowly
+    beerState = BEER_STATE_AVAILABLE;
+
     webSocket.sendTXT("Connected");
   }
   break;
@@ -436,6 +450,43 @@ void handleFileRequest(String path) {
   }
 }
 
+// web server callback for current status, returns a JSON document with current status
+void handleWebserverStatus() {
+  switch ( beerState ) {
+    case BEER_STATE_UNAVAILABLE:
+      server.send(200,"application/json","{\"status\":\"unavailable\"}");
+      break;
+    case BEER_STATE_AVAILABLE:
+      server.send(200,"application/json","{\"status\":\"available\"}");
+      break;
+    case BEER_STATE_POURING:
+      server.send(200,"application/json","{\"status\":\"pouring\"}");
+      break;
+    default:
+      server.send(200,"application/json","{\"status\":\"unknown\"}");
+      break;
+  }
+}
+
+// blink the led in a non-blocking way
+void flashLed() {
+  static long currentMillis = 0;
+  static long previousMillis = 0;
+  static bool _ledState = LOW;
+
+  // we slowly flash the led when in a good state, ready for beer serving
+  currentMillis = millis();
+  if ( currentMillis - previousMillis > LED_BLINK_INTERVAL ) {
+    if ( _ledState == LOW ) {
+      _ledState = HIGH;
+    } else {
+      _ledState = LOW;
+    }
+    previousMillis = currentMillis;
+    digitalWrite(LED_BUILTIN, _ledState);
+  }
+}
+
 void setup()
 {
   // Initialise serial port and print welcome message
@@ -459,7 +510,7 @@ void setup()
   beerServo.attach(config_gpio_pin);
   delay(1000);
   beerServo.write(config_servo_valve_close); // close servo valve
-  digitalWrite(LED_BUILTIN, HIGH);  // turn off the LED
+  digitalWrite(LED_BUILTIN, LOW);  // turn on the LED
 
 
   // bind callbacks to commands on the CLI
@@ -484,6 +535,7 @@ void setup()
   webSocket.setReconnectInterval(5000);
 
   // web server config
+  server.on("/status",HTTP_GET,handleWebserverStatus);
   server.serveStatic("/",LittleFS,"/");
   server.begin();
 
@@ -491,8 +543,8 @@ void setup()
   Serial.println("CLI ready");
   Serial.print(" > ");
 
-  // make beer tap available
-  beerState = BEER_STATE_AVAILABLE;
+  // turn of ledd
+  digitalWrite(LED_BUILTIN, HIGH);  // turn off the LED
 }
 
 void loop()
@@ -502,6 +554,11 @@ void loop()
 
   // keep websocket connection running
   webSocket.loop();
+
+  // handle the Led (and blinking)
+  if ( beerState == BEER_STATE_AVAILABLE ) {  
+    flashLed(); 
+  }
 
   // CLI event loop. Reads input from serial port, if enter is pressed, the gathered input is parsed and processed
   if (Serial.available())

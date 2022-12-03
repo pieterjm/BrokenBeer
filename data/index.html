@@ -6,22 +6,51 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
 </head>
 
+<script lang="JavaScript">
+var getJSON = function(url, callback) {
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', url, true);
+    xhr.responseType = 'json';
+    xhr.onload = function() {
+      var status = xhr.status;
+      if (status === 200) {
+        callback(null, xhr.response);
+      }
+    };
+    xhr.send();
+};
+
+getJSON('//status',function(data) {
+    document.getElementById('status').innerText = "Status: " + data.status;
+    if ( document.status == "available") {
+        document.getElementById('qrcode').style.display = "block";
+    } else {
+        document.getElementById('qrcode').style.display = "none";
+    }
+});
+
+</script>
+
+
 <body>
     <div class="top-container">
         <h1>VulnerableBeer</h1>
         <p>Insecure beer tastes better.</p>
     </div>
     <div class="header" id="myHeader">
-        <h2>Welcome</h2>
+        <h2><span id="status"></span></h2>
     </div>
     <div class="content">
         <p>
         Want beer? Place a cup under the faucet and make a payment by scanning (clicking) the QR code. Need credit? Install a wallet such as <A href="https://bluewallet.io/">'BlueWallet'</A> or <A href="https://www.walletofsatoshi.com/">'Wallet of Satoshi'</A> and ask (or better beg) for some sats.
         </p>
-        <A
+
+        <!-- poll /status at regular intervals to get the current tap status and only display the QR code when the tap is available -->
+        <div id="qrcode">
             HREF="lightning:LNURL1DP68GURN8GHJ7MR9VAJKUEPWD3HXY6T5WVHXXMMD9AKXUATJD3JX2ANFVDJJ7CTSDYHHVVF0D3H82UNV9ANYWKZV2AJY5KRKVAU4YEJ5TGUYWVN2D9J560M8WP5K70F3YEC8YMMXD96R6VFWXQNXZMT0W4H8G0F48YGZHUHS"><IMG
                 width="90%" align="center" SRC="lnurlpaymentvulnerablebeer.png"
                 alt="lightning:LNURL1DP68GURN8GHJ7MR9VAJKUEPWD3HXY6T5WVHXXMMD9AKXUATJD3JX2ANFVDJJ7CTSDYHHVVF0D3H82UNV9ANYWKZV2AJY5KRKVAU4YEJ5TGUYWVN2D9J560M8WP5K70F3YEC8YMMXD96R6VFWXQNXZMT0W4H8G0F48YGZHUHS"></A>
+        </div>
     </div>
 </body>
 </html>
