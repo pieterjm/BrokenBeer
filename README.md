@@ -1,16 +1,35 @@
-# VulnerableBeer
+# BrokenBeer
 
-VulnerableBeer is a Vulnerable-by-Design IoT beer tender application. This version runs on a ESP8266 microcontroller, in this case a D1 mini pro. 
+BrokenBeer is a Vulnerable-by-Design IoT beer tender application. The core of BrokenBeer is an ESP8266 microcontroller, in this case a D1 mini.
+
+WARNING: THIS APPLICATION CONTAINS SECURITY VULNERABILTIIES. USE AT YOUR OWN RISK!!!!
+
+The goal of BrokenBeer is to experiment with vulnerabilities in IoT applications. While it is fully operational, there are several routes that compromise the beertap.
 
 ## Vulnerable-by-Design beer tender
 
-### Hardware components
-VulnerableBeer is an old beertender that is modified to accomodate a 'tapvat' (https://www.beerwulf.com/nl/p/bier/heineken-5l-tapvat). The lever of the 'tapvat' is operated by a servo (https://www.tinytronics.nl/shop/nl/mechanica-en-actuatoren/motoren/servomotoren/td-8130mg-waterproof-digitale-servo-30kg), which is controlled by a D1 mini pro (ESP8266) microcontroller (https://www.benselectronics.nl/wemos-d1-mini-pro.html). 
+### Hardware construction
+BrokenBeer consists of the following hardware components:
+  * A servo motor (https://www.tinytronics.nl/shop/nl/mechanica-en-actuatoren/motoren/servomotoren/td-8120mg-waterproof-digitale-servo-20kg),
+  * An ESP8266 microcontroller (https://www.benselectronics.nl/wemos-d1-mini-pro.html).
+  * A 5V power adapter
+  * Some wires, wood, screws, etc. 
+  * A second hand beertender (optional)
+  * A 'tapvat' (https://www.beerwulf.com/nl/p/bier/heineken-5l-tapvat)
 
-### Happy flow, ordering a beer
-The happy flow of vulnerable beer is to order a beer after making a payment with Bitcoin over the lightning network. For this purpose, LNbits (https://lnbits.com) is used. LNbits is an open-source wallet system with various features to connect lightning wallets to devices.  
+The servo, controlled by the ESP, operates the lever of the 'tapvat'. Some pictures of my build are shown below:
 
-VulnerableBeer requires internet access. When VulnerableBeer is started for the first time, an open accesspoint is started (VulnerableBeer). When connected to this network, a web page should be opened with a menu to configure internet access. These settings are stored in the D1 mini so that when starting the next time, the network connection is automatically started. If the configured Wi-Fi network is not detected, the open accesspoint will be provided to reconfigure the wireless network.
+![](/topview.jpg) ![](/overview.jpg)
+
+### Wiring
+
+The 5V from the powersupply is connected to the servo and the 5V port of the D1 mini. The ground from the powersupply is connected to the servo and the GND port of the D1 mini. Pin D7 of the D1 mini is connected to the signal wire of the servo. 
+
+## Happy flow, ordering a beer
+
+The happy flow is the process of ordering a beer by making a payment. Payments are done using LNbits (https://lnbits.com) an open-source wallet system with various features to connect Bitcoin lightning wallets to devices. After succesfull payment, the beertap receives a message from LNbits via a websocket and starts the process of pouring a beer. 
+
+BrokenBeer requires internet access. When started for the first time (or when no network can be found), an open accesspoint is started (BrokenBeer). When connected to this network, a web page should be opened with a menu to configure internet access. These settings are stored in the D1 mini so that when starting the next time, the network connection is automatically started. If the configured Wi-Fi network is not detected, the open accesspoint will be provided as fall back to reconfigure the wireless network.
 
 Once connected to the internet, a WebSocket connection will be opened to 'legend.lnbits.com'. This is an open 'test' server of LNbits. A wallet in LNbits is configured to send a message via the WebSocket, when someone has payed for a beer. The payment URL is available in the QR code. This can be scanned with any modern Bitcoin wallet (Bluewallet, Wallet of Satoshi, ...).
 
