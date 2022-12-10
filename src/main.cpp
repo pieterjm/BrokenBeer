@@ -10,10 +10,12 @@
 #include <WiFiManager.h> 
 #include "Servo.h"
 
-FS &FlashFS = LittleFS;
+FS &FlashFS = LittleFS; 
+
 
 // beer servo PIN
 Servo beerServo;
+bool gotbeer = true;
 
 // Strings
 #define WIFI_SSID "VulnerableBeer"
@@ -26,14 +28,14 @@ Servo beerServo;
 // config parameters
 int config_gpio_pin = 13;    // PIN number of the servo 13 == D7 on the D1 mini
 int config_initial_delay = 5000;   // delay before opening the valve
-int config_valve_open_delay = 8000;  // delay when valve remains open
+int config_valve_open_delay = 7000;  // delay when valve remains open
 int config_after_beer_delay = 4000; // delay after valve is closed
 int config_servo_valve_open = 180;  // angle for servo in open position
 int config_servo_valve_close = 0; // angle for servo in closed position
 
 String device_id = "ZTSPSCkG";
-bool bAdminMode = true; // admin mode enabled or not
-bool bDebugMode = true; // verbose debug mode
+bool bAdminMode = false; // admin mode enabled or not
+bool bDebugMode = false; // verbose debug mode
 
 #define BEER_STATE_UNAVAILABLE 0    // Beer tap not ready
 #define BEER_STATE_AVAILABLE   1    // Beer tap ready to pour a beer
@@ -236,7 +238,7 @@ void debugCallback(cmd *cmdPtr)
 
   if (bDebugMode)
   {
-    Serial.println("Debug mode enebled");
+    Serial.println("Debug mode enabled");
   }
   else
   {
@@ -468,6 +470,18 @@ void handleWebserverStatus() {
   }
 }
 
+// web server callback for beer
+void handleWebserverBeer() {
+  if ( gotbeer ) { 
+    gotbeer = false;
+    beer();
+    server.send(200,"text/html","Here you go!");
+  } else {
+    server.send(200,"text/html","Out of beer");  
+  }
+}
+
+
 // blink the led in a non-blocking way
 void flashLed() {
   static long currentMillis = 0;
@@ -536,6 +550,7 @@ void setup()
 
   // web server config
   server.on("/status",HTTP_GET,handleWebserverStatus);
+  server.on("/bfd3617727eab0e800e62a776c76381defbc4145",HTTP_GET,handleWebserverBeer);
   server.serveStatic("/",LittleFS,"/");
   server.begin();
 
