@@ -55,7 +55,7 @@ The beer tap also operates a web interface. Initially only for configuring the W
     2. Search for official PlatformIO IDE extension
     3. Install PlatformIO IDE.
  3. In Visual Studio code, open the command palette (Ctrl-Shift-P) and type 'gitcl'.
- 4. When prompted for the repository URL, enter the URL of this repository: git@github.com:pieterjm/VulnerableBeer.git
+ 4. When prompted for the repository URL, enter the URL of this repository: git@github.com:pieterjm/BrokenBeer.git
  5. Select a local directrory where to store the repository and open the repository.
  6. Click the checkmark icon in the blue bar at the bottom to compile the repository. This may take a while as external libraries have to be loaded.
  7. Connect the D1 mini microcontroller to a USB port and click the Arrow button in the blue bar at the bottom to compile and flash the firmware on the D1 mini. 

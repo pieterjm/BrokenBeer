@@ -18,7 +18,7 @@ Servo beerServo;
 bool gotbeer = true;
 
 // Strings
-#define WIFI_SSID "VulnerableBeer"
+#define WIFI_SSID "BrokenBeer"
 #define WIFI_PSK ""
 #define ERROR_UNKNOWN_COMMAND_ARGUMENT "Unknown command argument."
 #define ERROR_UNKNOWN_COMMAND "Unknown command."
